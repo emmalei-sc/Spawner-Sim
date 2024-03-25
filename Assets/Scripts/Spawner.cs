@@ -18,6 +18,16 @@ public class Spawner : MonoBehaviour
         SpawnUnit(spawnPosition.position);
     }
 
+    private void OnMouseEnter()
+    {
+        transform.localScale *= 1.2f;
+    }
+
+    private void OnMouseExit()
+    {
+        transform.localScale /= 1.2f;
+    }
+
     public void SpawnUnit(Vector3 pos)
     {
         GameObject obj = ObjectPoolManager.instance.GetPooledObject(objectType);
@@ -27,7 +37,6 @@ public class Spawner : MonoBehaviour
             obj = ObjectPoolManager.instance.AddToPool(objectType);
         }
         // Move unit to position
-        obj.transform.SetParent(transform);
         float halfHeight = obj.GetComponent<MeshRenderer>().bounds.extents.y;
         obj.transform.position = new Vector3(pos.x, halfHeight, pos.z);
 
