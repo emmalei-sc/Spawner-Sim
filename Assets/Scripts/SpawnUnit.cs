@@ -19,6 +19,8 @@ public class SpawnUnit : MonoBehaviour
     protected float spawnCooldownTimer = 0f;
     protected bool canSpawn = false;
     protected Vector3 lastCollisionPt = Vector3.zero;
+    protected bool spawnInProgress = false;
+
     public int GetSpawnID() { return spawnID; }
     protected void Awake()
     {
@@ -33,12 +35,12 @@ public class SpawnUnit : MonoBehaviour
     {
         CalculateNewDestination();
         spawnCooldownTimer = 0f;
-        canSpawn = true;
+        canSpawn = false;
     }
 
     private void FixedUpdate()
     {
-        if (!canSpawn)
+        if (!spawnInProgress && !canSpawn)
         {
             if (spawnCooldownTimer > spawnBufferTime)
             {
@@ -47,6 +49,8 @@ public class SpawnUnit : MonoBehaviour
             }
             spawnCooldownTimer += Time.deltaTime;
         }
+
+
     }
 
     protected virtual void Update()
@@ -87,20 +91,18 @@ public class SpawnUnit : MonoBehaviour
             Vector3 refl = Vector3.Reflect(velocity.normalized, collisionPt.normal);
             refl.y = 0f;
             refl.Normalize();
-            //Debug.DrawLine(collisionPt.point, collisionPt.point + collisionPt.normal, Color.red, 10f);
-            //Debug.DrawLine(collisionPt.point, collisionPt.point + refl, Color.green, 10f);
 
             CalculateNewDestination(refl);
 
             lastCollisionPt = collisionPt.point;
 
-            /*// Have only one unit spawn a clone
+            // Have only one unit spawn a clone
             if (canSpawn && this.spawnID > other.GetSpawnID())
             {
                 SpawnNewUnit(collisionPt.point);
                 Debug.Log("spawn new unit here");
                 canSpawn = false;
-            }*/
+            }
         }
     }
 
@@ -112,36 +114,44 @@ public class SpawnUnit : MonoBehaviour
 
         ContactPoint collisionPt = collision.GetContact(0);
         Vector3 toOtherUnit = collision.gameObject.transform.position - transform.position;
-        //Debug.DrawLine(transform.position, transform.position + toOtherUnit, Color.blue, 10f);
         toOtherUnit.y = 0f;
         toOtherUnit.Normalize();
 
         CalculateNewDestination(-1f * toOtherUnit);
-        lastCollisionPt = collisionPt.point;
-        canSpawn = false;
+        //lastCollisionPt = collisionPt.point;
+        //canSpawn = false;
+        //spawnCooldownTimer = 0f;
     }
-    protected void OnCollisionExit(Collision collision)
+    /*protected void OnCollisionExit(Collision collision)
     {
         SpawnUnit other = collision.gameObject.GetComponent<SpawnUnit>();
         if (other == null)
             return;
 
         if (lastCollisionPt == Vector3.zero) // If the collision pt was somehow not set, set it to a previous position in our path
-            lastCollisionPt = transform.position - (velocity * m_coll.bounds.extents.x);
+            //lastCollisionPt = transform.position - (velocity * m_coll.bounds.extents.x);
+            return;
 
         // Have only one unit spawn a clone
         if (canSpawn && this.spawnID > other.GetSpawnID())
         {
-            StartCoroutine(DelayedSpawn(spawnBufferTime, lastCollisionPt));
-            Debug.Log("spawn new unit");
+            //StartCoroutine(DelayedSpawn(spawnBufferTime, lastCollisionPt));
+            SpawnNewUnit(lastCollisionPt);
             canSpawn = false;
+            Debug.Log("spawn new unit");
         }
-    }
+    }*/
 
     IEnumerator DelayedSpawn(float seconds, Vector3 pos)
     {
+        spawnInProgress = true;
+        canSpawn = false;
         yield return new WaitForSeconds(seconds);
+
         SpawnNewUnit(pos);
+        spawnInProgress = false;
+        canSpawn = true;
+        spawnCooldownTimer = 0f;
     }
 
     private void SpawnNewUnit(Vector3 pos)

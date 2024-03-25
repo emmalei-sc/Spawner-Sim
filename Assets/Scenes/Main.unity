@@ -1039,22 +1039,22 @@ MonoBehaviour:
   objectPools:
   - type: 0
     pooledObject: {fileID: 2046096301}
-    poolSize: 100
+    poolSize: 500
     objList: []
   - type: 1
     pooledObject: {fileID: 5026394945569582134, guid: f40d525ae8ea4d040bc31b5428bb2eee,
       type: 3}
-    poolSize: 100
+    poolSize: 500
     objList: []
   - type: 2
     pooledObject: {fileID: 5026394945569582134, guid: 2b17fd733c30e0145a0d864b69558afb,
       type: 3}
-    poolSize: 100
+    poolSize: 500
     objList: []
   - type: 3
     pooledObject: {fileID: 5026394945569582134, guid: 257e90dfb7742124bb45f92a9e30b9f6,
       type: 3}
-    poolSize: 100
+    poolSize: 500
     objList: []
 --- !u!4 &875175028
 Transform:
