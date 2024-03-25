@@ -1,16 +1,15 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class SpawnUnit : MonoBehaviour
 {
     // This implementation could potentially be replaced w/ inheritance (already pre-emptively set up) if we wanted units with unique behavior
     // But for now we are simply using an enum to track unit type
-    public ObjectPoolManager.ObjectType type;
+    public ObjectType type;
     public static int idCount = 0;
     
-    [SerializeField] protected float speed = 5f;
-    [SerializeField] protected float spawnBufferTime = 0.5f;
+    [SerializeField] protected float speed;
+    [SerializeField] protected float spawnBufferTime;
 
     protected Vector3 dest = Vector3.zero;
     protected Collider m_coll;
@@ -50,7 +49,14 @@ public class SpawnUnit : MonoBehaviour
             spawnCooldownTimer += Time.deltaTime;
         }
 
-
+        // Manually slow down spawns...
+        Spawner sp = SpawnerManager.instance.GetSpawnerOfType(type);
+        int spwnCount = sp.spawnCount;
+        if (spwnCount > 200)
+        {
+            m_coll.enabled = (Random.value > 0.5f); // 50% chance of disabling the collider
+            spawnBufferTime = spwnCount * 0.05f;
+        }
     }
 
     protected virtual void Update()
@@ -83,6 +89,7 @@ public class SpawnUnit : MonoBehaviour
         if (other.type != type)
         {
             ObjectPoolManager.instance.Release(gameObject);
+            SpawnerManager.instance.GetSpawnerOfType(type).DecreaseSpawnCount();
         }
         // Handle collision with same type unit
         else
@@ -99,8 +106,8 @@ public class SpawnUnit : MonoBehaviour
             // Have only one unit spawn a clone
             if (canSpawn && this.spawnID > other.GetSpawnID())
             {
-                SpawnNewUnit(collisionPt.point);
-                Debug.Log("spawn new unit here");
+                Spawner sp = SpawnerManager.instance.GetSpawnerOfType(type);
+                sp.SpawnUnit(collisionPt.point);
                 canSpawn = false;
             }
         }
@@ -142,7 +149,7 @@ public class SpawnUnit : MonoBehaviour
         }
     }*/
 
-    IEnumerator DelayedSpawn(float seconds, Vector3 pos)
+    /*IEnumerator DelayedSpawn(float seconds, Vector3 pos)
     {
         spawnInProgress = true;
         canSpawn = false;
@@ -152,9 +159,9 @@ public class SpawnUnit : MonoBehaviour
         spawnInProgress = false;
         canSpawn = true;
         spawnCooldownTimer = 0f;
-    }
+    }*/
 
-    private void SpawnNewUnit(Vector3 pos)
+    /*private void SpawnNewUnit(Vector3 pos)
     {
         GameObject obj = ObjectPoolManager.instance.GetPooledObject(type);
         if (obj == null)
@@ -171,7 +178,7 @@ public class SpawnUnit : MonoBehaviour
         {
             unit.Initialize();
         }
-    }
+    }*/
     protected void CalculateNewDestination(Vector3 inDir = default) // optional param to find a position in direction inDir
     {
         // Set new destination and velocity

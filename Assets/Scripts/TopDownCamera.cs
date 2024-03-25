@@ -13,9 +13,9 @@ public class TopDownCamera : MonoBehaviour
     [SerializeField] AnimationCurve panSpeedByDistance;
     [SerializeField] AnimationCurve zoomSpeedCurve;
 
-    [SerializeField] private float defaultHeight = 20.0f;
-    [SerializeField] private float MaxCameraHeight = 40.0f;
-    [SerializeField] private float MinCameraHeight = 5.0f;
+    [SerializeField] private float defaultHeight;
+    [SerializeField] private float MaxCameraHeight;
+    [SerializeField] private float MinCameraHeight;
 
     private Camera camComp;
     private float zoomSpeed = 2.0f;
