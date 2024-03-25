@@ -379,7 +379,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 35
+  orthographic size: 40
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -475,18 +475,18 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 10
-      inSlope: 30
-      outSlope: 30
+      value: 25
+      inSlope: 75
+      outSlope: 75
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 40
-      inSlope: 30
-      outSlope: 30
+      value: 100
+      inSlope: 75
+      outSlope: 75
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -518,7 +518,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  defaultHeight: 35
+  defaultHeight: 40
   MaxCameraHeight: 75
   MinCameraHeight: 5
 --- !u!1 &410087039
@@ -1880,7 +1880,7 @@ Transform:
   m_GameObject: {fileID: 2104715934}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -70.7, y: 0, z: -3.6}
+  m_LocalPosition: {x: -65.2, y: 0, z: -13.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

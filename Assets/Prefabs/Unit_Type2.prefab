@@ -147,5 +147,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  speed: 7
-  spawnBufferTime: 0.75
+  speed: 15
+  lowerLoadLimit: 200
+  minSpawnCooldown: 1
+  minPercentDisabled: 25
+  upperLoadLimit: 500
+  maxSpawnCooldown: 10
+  maxPercentDisabled: 80
