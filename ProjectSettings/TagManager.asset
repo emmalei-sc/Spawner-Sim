@@ -8,16 +8,16 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - SpawnUnit
+  - 
   - Water
   - UI
   - Spawner
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Unit_Type1
+  - Unit_Type2
+  - Unit_Type3
+  - Unit_Type4
+  - Boundary
   - 
   - 
   - 

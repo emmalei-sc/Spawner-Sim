@@ -8,6 +8,10 @@ public class Spawner : MonoBehaviour
     [SerializeField] private Transform spawnPosition;
 
     public int spawnCount { get; private set; }
+    private void Awake()
+    {
+        spawnCount = 0;
+    }
 
     private void OnMouseDown()
     {
@@ -35,9 +39,14 @@ public class Spawner : MonoBehaviour
         }
 
         spawnCount++;
+        DebugHUD.instance.PrintToHUD(spawnCount.ToString(), gameObject.name + " Spawn Count");
     }
 
     public ObjectType GetObjectType() { return objectType; }
 
-    public void DecreaseSpawnCount() { spawnCount--; }
+    public void DecreaseSpawnCount() 
+    {
+        spawnCount--;
+        DebugHUD.instance.PrintToHUD(spawnCount.ToString(), gameObject.name + " Spawn Count");
+    }
 }

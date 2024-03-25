@@ -20,6 +20,7 @@ public class SpawnUnit : MonoBehaviour
     [SerializeField] protected float maxSpawnCooldown;
     [SerializeField] protected float maxPercentDisabled;
 
+    protected Spawner sp;
     protected Vector3 dest = Vector3.zero;
     protected Collider m_coll;
     protected Vector3 velocity = Vector3.zero;
@@ -27,33 +28,37 @@ public class SpawnUnit : MonoBehaviour
     protected float spawnCooldown;
     protected float spawnCooldownTimer = 0f;
     protected bool onCooldown = true;
-    //protected bool offCooldown = false;
-    protected Vector3 lastCollisionPt = Vector3.zero;
     protected bool spawnInProgress = false;
-    protected bool disableNewSpawns = false;
+    protected bool enableSelfCollisions = true;
 
     public int GetSpawnID() { return spawnID; }
     protected void Awake()
     {
         m_coll = GetComponent<Collider>();
 
-        // Assign an id to this unit. This will be used to determine which unit spawns a clone upon collision
+        // Assign an ID to this unit. This will be used to determine which unit spawns a clone upon collision
         spawnID = idCount;
         idCount++;
 
         spawnCooldown = minSpawnCooldown;
     }
-    
+    private void Start()
+    {
+        sp = SpawnerManager.instance.GetSpawnerOfType(type);
+    }
+
     public virtual void Initialize() // To be called when spawned into scene
     {
         CalculateNewDestination();
         spawnCooldownTimer = 0f;
         onCooldown = true;
+        enableSelfCollisions = true;
+        spawnInProgress = false;
     }
 
     private void FixedUpdate()
     {
-        if (!spawnInProgress && !disableNewSpawns && onCooldown)
+        if (!spawnInProgress && enableSelfCollisions && onCooldown)
         {
             if (spawnCooldownTimer > spawnCooldown)
             {
@@ -63,26 +68,36 @@ public class SpawnUnit : MonoBehaviour
             spawnCooldownTimer += Time.deltaTime;
         }
 
-        // Manually cool down our spawn rate
-        Spawner sp = SpawnerManager.instance.GetSpawnerOfType(type);
+        // Manually cool down our spawn rate & collisions
         int spawnCnt = sp.spawnCount;
         if (spawnCnt > lowerLoadLimit)
         {
-            disableNewSpawns = (Random.value > (1 - CalculateDisabledRate(spawnCnt))); // % chance of disabling new spawns
+            if (enableSelfCollisions)
+                enableSelfCollisions = Random.value > CalculateDisabledRate(spawnCnt); // % chance of disabling collisions
+            if (!enableSelfCollisions)
+            {
+                LayerMask selfLayer = gameObject.layer;
+                m_coll.excludeLayers = selfLayer;
+            }
             spawnCooldown = CalculateSpawnRate(spawnCnt); // Adjust time between spawns
+        }
+        else
+        {
+            enableSelfCollisions = true;
+            spawnCooldown = minSpawnCooldown;
         }
     }
     private float CalculateSpawnRate(int spawnCnt)
     {
         float ratio = (spawnCnt - lowerLoadLimit) / (upperLoadLimit - lowerLoadLimit);
-        float percent = Mathf.Lerp(minSpawnCooldown, maxSpawnCooldown, ratio);
-        return percent;
+        float rate = Mathf.Lerp(minSpawnCooldown, maxSpawnCooldown, ratio);
+        return rate;
     }
     private float CalculateDisabledRate(int spawnCnt)
     {
         float ratio = (spawnCnt - lowerLoadLimit) / (upperLoadLimit - lowerLoadLimit);
         float percent = Mathf.Lerp(minPercentDisabled, maxPercentDisabled, ratio);
-        return percent;
+        return percent / 100f;
     }
 
     protected virtual void Update()
@@ -96,15 +111,20 @@ public class SpawnUnit : MonoBehaviour
             transform.position += velocity * Time.deltaTime;
             Vector3 toDest = dest - transform.position;
 
-            if (toDest.sqrMagnitude < 0.2f*0.2f ||
-                transform.position.x < BoundsInfo.areaBounds.min.x ||
-                transform.position.x > BoundsInfo.areaBounds.max.x ||
-                transform.position.z < BoundsInfo.areaBounds.min.z ||
-                transform.position.z > BoundsInfo.areaBounds.max.z)
+            if (toDest.sqrMagnitude < 0.2f*0.2f)
+            {
+                CalculateNewDestination();
+            }
+
+            if (transform.position.x < BoundsInfo.areaBounds.min.x ||
+            transform.position.x > BoundsInfo.areaBounds.max.x ||
+            transform.position.z < BoundsInfo.areaBounds.min.z ||
+            transform.position.z > BoundsInfo.areaBounds.max.z)
             {
                 CalculateNewDestination();
             }
         }
+        
     }
 
     protected void OnCollisionEnter(Collision collision)
@@ -113,25 +133,22 @@ public class SpawnUnit : MonoBehaviour
         if (other == null)
             return;
 
-        ContactPoint collisionPt = collision.GetContact(0);
-
         // Handle collision with different type unit
         if (other.type != type)
         {
-            ObjectPoolManager.instance.Release(gameObject);
-            SpawnerManager.instance.GetSpawnerOfType(type).DecreaseSpawnCount();
+            ObjectPoolManager.instance.Release(gameObject, type);
         }
         // Handle collision with same type unit
-        else if (!disableNewSpawns)
+        else if (enableSelfCollisions)
         {
+            ContactPoint collisionPt = collision.GetContact(0);
+
             // Reflect this unit's movement around the collision normal
             Vector3 refl = Vector3.Reflect(velocity.normalized, collisionPt.normal);
             refl.y = 0f;
             refl.Normalize();
 
             CalculateNewDestination(refl);
-
-            lastCollisionPt = collisionPt.point;
 
             // Have only one unit spawn a clone
             if (!onCooldown && this.spawnID > other.GetSpawnID())
@@ -197,7 +214,7 @@ public class SpawnUnit : MonoBehaviour
 
         float bound = Mathf.Min(xBound, zBound);
 
-        float mult = Random.Range(1f, bound);
+        float mult = Random.Range(0f, bound);
         Vector3 scaledDir = dir * mult;
 
         Vector3 pos = transform.position + scaledDir;

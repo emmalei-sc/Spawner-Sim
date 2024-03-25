@@ -74,10 +74,11 @@ public class ObjectPoolManager : MonoBehaviour
         return obj;
     }
 
-    public void Release(GameObject obj)
+    public void Release(GameObject obj, ObjectType type)
     {
         obj.transform.parent = transform;
         obj.SetActive(false);
+        SpawnerManager.instance.GetSpawnerOfType(type).DecreaseSpawnCount();
     }
 
     void OnDestroy()

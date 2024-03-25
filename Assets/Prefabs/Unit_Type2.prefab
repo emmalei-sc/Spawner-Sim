@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 982136644447261031}
   - component: {fileID: -3705860153701107381}
   - component: {fileID: 6315010924264348179}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Unit_Type2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,9 +148,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 1
   speed: 15
-  lowerLoadLimit: 200
-  minSpawnCooldown: 1
-  minPercentDisabled: 25
-  upperLoadLimit: 500
-  maxSpawnCooldown: 10
-  maxPercentDisabled: 80
+  lowerLoadLimit: 100
+  minSpawnCooldown: 0.75
+  minPercentDisabled: 2
+  upperLoadLimit: 400
+  maxSpawnCooldown: 3
+  maxPercentDisabled: 10
