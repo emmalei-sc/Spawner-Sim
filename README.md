@@ -1,5 +1,5 @@
 # Battle of the Foods!
- This is a spawn simulation project experimenting with managing and spawning hundreds of objects at a time. The goals were to gain practice with spawn managers, object pooling, and runtime optimization.
+ This is a spawn simulation project experimenting with managing and spawning hundreds of objects at a time. The goals were to gain experience with spawn managers, object pooling, and runtime optimization.
  
 ### Controls
 * **Mouse Click** on the food items to spawn units
